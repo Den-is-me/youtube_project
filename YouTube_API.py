@@ -3,8 +3,9 @@ import os
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-load_dotenv()
 
+
+load_dotenv()
 
 # Put parameters using API documentation(https://developers.google.com/youtube/v3/docs/search/list)
 search_params = {'q': 'Nature',  # Requset to youtube
