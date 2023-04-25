@@ -52,7 +52,7 @@ connect = psycopg2.connect(host=os.getenv('host'),
                            password=os.getenv('password'))
 cursor = connect.cursor()
 
-for i in range(50):  # choose how many pages to extract
+for i in range(5):  # Choose how many pages to extract
     search_result = youtube_search(search_params)
     date_extract = date.today()
 
@@ -64,7 +64,7 @@ for i in range(50):  # choose how many pages to extract
         channel_title = item['snippet']['channelTitle']
         channel_id = item['snippet']['channelId']
 
-        # extract video reactions
+        # Extract video reactions
         if video_id:
             description = video_statistics({'id': video_id, 'part': 'snippet'})['snippet']['description']
             actions = video_statistics({'id': video_id, 'part': 'statistics'})
@@ -77,22 +77,13 @@ for i in range(50):  # choose how many pages to extract
             like_count = None
             comment_count = None
 
-        # Check if channel already exists in 'channel' table
-        cursor.execute("SELECT channel_id FROM channel WHERE channel_id = %s;", (channel_id,))
-        result = cursor.fetchone()
-        if not result:
-            # Insert channel data into channel table
-            cursor.execute('''INSERT INTO channel (channel_id, title)
-                           VALUES (%s, %s);''', (channel_id, channel_title))
-            connect.commit()
-
-        # Insert video data into 'video' table
-        cursor.execute("""INSERT INTO video
+        # Insert video data into youtube table
+        cursor.execute("""INSERT INTO youtube
                        (date_extract, video_id, title, description, view_count, like_count, comment_count, 
-                       time_published, channel_id)
-                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);""",
+                       time_published, channel_id, channel_title)
+                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);""",
                        (date_extract, video_id, video_title, description, view_count, like_count,
-                        comment_count, time_published, channel_id))
+                        comment_count, time_published, channel_id, channel_title))
         connect.commit()
 
     search_params['pageToken'] = search_result['nextPageToken']
