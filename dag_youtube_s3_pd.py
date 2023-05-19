@@ -12,7 +12,7 @@ from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 dag = DAG(
     dag_id='dag_tr_youtube_s3_pd.py',
     default_args={'owner': 'aiflow'},
-    schedule_interval='0 10 * * *',
+    schedule_interval='0 5 * * *',
     start_date=days_ago(1)
 )
 
@@ -37,16 +37,16 @@ def extract_youtube(**context):
 
     youtube_df = pd.DataFrame(columns=['date_extract', 'video_id', 'title', 'description', 'view_count', 'like_count', 'comment_count',
                                        'time_published', 'channel_id', 'channel_title'])
-    search_params = {'q': 'Stand up',  # Request to youtube
+    search_params = {'q': 'мультики для малышей',  # Request to youtube
                      'part': 'snippet',
                      'regionCode': 'RU',  # Return search results for videos that can be viewed in the specified country
-                     'maxResults': 5}  # Max videos in result
+                     'maxResults': 50}  # Max videos in result. Acceptable values are 0 to 50
     DEVELOPER_KEY = Variable.get('DEVELOPER_KEY')
     YOUTUBE_API_SERVICE_NAME = 'youtube'
     YOUTUBE_API_VERSION = 'v3'
     date_extract = context['ds']
 
-    for i in range(1):  # Choose how many pages to extract
+    for i in range(20):  # Choose how many pages to extract
         search_result = youtube_search(search_params)
 
         for item in search_result['items']:
@@ -83,7 +83,10 @@ def extract_youtube(**context):
                 'channel_title': channel_title},
                 ignore_index=True)
 
-        search_params['pageToken'] = search_result['nextPageToken']
+        try:
+            search_params['pageToken'] = search_result['nextPageToken']
+        except KeyError:
+            break
 
     context['ti'].xcom_push(key='youtube_df', value=youtube_df)
 
@@ -104,12 +107,14 @@ def load_df_postgres(**context):
     df = context['ti'].xcom_pull(task_ids='extract_youtube', key='youtube_df')
     pd.set_option('display.max_columns', None)
     print(df.head(5))
+    print(df.shape)
 
     df.dropna(subset=['video_id', 'channel_id'], inplace=True)
     df.fillna({'comment_count': 0,
                'view_count': 0,
                'like_count': 0},
               inplace=True)
+    df.drop_duplicates(subset='video_id', inplace=True)
 
     pg_conn.insert_rows(table='youtube',
                         rows=df.values.tolist(),
@@ -136,10 +141,11 @@ t4 = PostgresOperator(task_id='load_business',
                     SELECT DISTINCT(channel_id), channel_title
                     FROM public.youtube
                     WHERE channel_id NOT IN (SELECT channel_id
-                                            FROM business.channels);
+                                            FROM business.channels)
+                    ON CONFLICT DO NOTHING;
 
                     INSERT INTO business.videos
-                    SELECT rank, video_id, title, description, view_count, like_count, comment_count, time_published, channel_id
+                    SELECT rank, date_extract, video_id, title, description, view_count, like_count, comment_count, time_published, channel_id
                     FROM public.youtube;
                     ''')
 
