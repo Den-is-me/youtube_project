@@ -12,8 +12,13 @@
 - [Counclusion](#conclusion)
 
 ### Idea
-
+Find the relationship between search rank and video attributes and analyze search ranking day by day. It's useful for content creation.
 ### Goals
+- Extract data from YouTube
+- Clean and Optimazy Data set for analysis
+- Load Data set to wharehouse
+- Load Data set to DB (staging --> business)
+- Analysis Data set
 
 ### Stack used
 - Yandex Cloud platform: 
