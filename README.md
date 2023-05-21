@@ -1,6 +1,7 @@
 # Youtube project
 **📊  Analysis youtube search algorithm**
 ## Architectural solution
+![image](images/solution.png)
 ## Plan:
 - [Idea](#idea)
 - [Goals](#goals)
@@ -44,9 +45,9 @@ I've desided to use the [Google API](https://developers.google.com/youtube/v3/do
 date_extract, video_id, title, description, view_count, like_count,comment_count, time_published, channel_id, channel_title
 ```
 The Operator in the [DAG](dag_youtube_s3_pd.py)
+![image](images/dag.png)
 ### Transform and Load
+
 ### Analysis
 ### Conclusion
-![image](images/solution.png)
-![image](images/dag.png)
 ![image](images/postgres%20-%20business.png)
