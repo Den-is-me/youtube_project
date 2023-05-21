@@ -44,7 +44,7 @@ I've desided to use the [Google API](https://developers.google.com/youtube/v3/do
 ```csv
 date_extract, video_id, title, description, view_count, like_count,comment_count, time_published, channel_id, channel_title
 ```
-The Operator in the [DAG](dag_youtube_s3_pd.py)
+The task 'extract_youtube' in the [DAG](dag_youtube_s3_pd.py)
 ![image](images/dag.png)
 ### Transform and Load
 
