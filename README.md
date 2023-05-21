@@ -47,7 +47,36 @@ date_extract, video_id, title, description, view_count, like_count,comment_count
 The task 'extract_youtube' in the [DAG](dag_youtube_s3_pd.py)
 ![image](images/dag.png)
 ### Transform and Load
+Then I defined 2 parallel tasks:
+- One load data without transformation to wharehouse, using PythonOperator in task:
+```python
+def load_df_s3(**context):
+    s3_conn = S3Hook(aws_conn_id='s3')
+    df = context['ti'].xcom_pull(task_ids='extract_youtube', key='youtube_df')
+    csv_data = df.to_csv(index=False)
+    file_name = f'youtube_extract_{context["ds"]}.csv'
+    s3_conn.load_string(csv_data, key=file_name, bucket_name='youtube-analytics', replace=True)
+    context['ti'].xcom_push(key='file_name', value=file_name)
+```
+- One transform data for analys and load it to Postgres ([DAG](dag_youtube_s3_pd.py)).
 
+After that, I've defined another task to transport data from staging to business schema in Postgres DB, using PostgresOperator:
+```python
+t4 = PostgresOperator(task_id='load_business',
+                      postgres_conn_id='postgres',
+                      sql='''
+                    INSERT INTO business.channels
+                    SELECT DISTINCT(channel_id), channel_title
+                    FROM public.youtube
+                    WHERE channel_id NOT IN (SELECT channel_id
+                                            FROM business.channels)
+                    ON CONFLICT DO NOTHING;
+
+                    INSERT INTO business.videos
+                    SELECT rank, date_extract, video_id, title, description, view_count, like_count, comment_count, time_published, channel_id
+                    FROM public.youtube;
+                    ''')
+```
+![image](images/postgres%20-%20business.png)
 ### Analysis
 ### Conclusion
-![image](images/postgres%20-%20business.png)
