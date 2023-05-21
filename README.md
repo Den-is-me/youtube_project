@@ -32,8 +32,9 @@ I will analyze children's content because it is one of the most popular and view
 ---
 ## Realization
 ### Extract from YouTube
-I used a Virtual Machine (CPU2, RAM 8Gb, HDD 50Gb) in Compute Cloud with Docker containers for Airflow and Postgres.
-I have used the [Google API](https://developers.google.com/youtube/v3/docs/search/list) to extract information from search results with request: "мультики для малышей".
+I used a Virtual Machine (CPU2, RAM 8Gb, HDD 50Gb) in Compute Cloud with [Docker containers](/docker) for Airflow and Postgres (not metadata store).
+I have used the [Google API](https://developers.google.com/youtube/v3/docs/search/list) in PythonOperator to extract information from search results with request: "мультики для малышей". There are two metodes which I used: 
+Then I defined [DAG](dag_create_tables_youtube.py) to create 2 schema with 3 tables (one is staging and two are business)
 ### Transform and Load
 ### Analysis
 ### Conclusion
