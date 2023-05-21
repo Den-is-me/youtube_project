@@ -18,8 +18,8 @@ Find the relationship between search rank and video attributes and analyze searc
 I will analyze children's content because it is one of the most popular and viewed segments on YouTube.
 ### Goals
 - Extract data from YouTube
-- Clean and optimizy Data set for analysis
-- Load Data set to wharehouse
+- Clean and optimize Data set for analysis
+- Load Data set to warehouse
 - Load Data set to DB (staging --> business)
 - Analysis Data set
 ### Stack used
@@ -38,9 +38,9 @@ I will analyze children's content because it is one of the most popular and view
 - Create S3 bucket in Object Storage.
 - Create connections
 - Check the data to be used
-- Create shemas and tables (I've defined [DAG](dag_create_tables_youtube.py) to create 2 schema with 3 tables (one is staging and two are business))
+- Create schemas and tables (I've defined [DAG](dag_create_tables_youtube.py) to create 2 schema with 3 tables (one is staging and two are business))
 ### Extract from YouTube
-I've desided to use the [Google API](https://developers.google.com/youtube/v3/docs/search/list) in PythonOperator to extract information from search results with request: "мультики для малышей". There are two methods which I've used search.list() and videos.list(). With these methods, I was able to extract the following information:
+I've decided to use the [Google API](https://developers.google.com/youtube/v3/docs/search/list) in PythonOperator to extract information from search results with request: "мультики для малышей". There are two methods which I've used search.list() and videos.list(). With these methods, I was able to extract the following information:
 ```csv
 date_extract, video_id, title, description, view_count, like_count,comment_count, time_published, channel_id, channel_title
 ```
@@ -58,7 +58,7 @@ def load_df_s3(**context):
     s3_conn.load_string(csv_data, key=file_name, bucket_name='youtube-analytics', replace=True)
     context['ti'].xcom_push(key='file_name', value=file_name)
 ```
-- One transform data for analys and load it to Postgres ([DAG](dag_youtube_s3_pd.py)).
+- One transfer data for analyze and load it into Postgres ([DAG](dag_youtube_s3_pd.py)).
 
 After that, I've defined another task to transport data from staging to business schema in Postgres DB, using PostgresOperator:
 ```python
@@ -79,4 +79,5 @@ t4 = PostgresOperator(task_id='load_business',
 ```
 ![image](images/postgres%20-%20business.png)
 ### Analysis
+![image](images/top%2015%20in%20search.bmp)
 ### Conclusion
