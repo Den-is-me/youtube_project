@@ -1,5 +1,4 @@
 FROM apache/airflow:2.6.0
-USER root
 
 USER root
 
