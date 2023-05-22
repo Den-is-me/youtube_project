@@ -14,12 +14,12 @@
 - [Conclusion](#conclusion)
 ## Plan
 ### Idea
-Find the relationship between search rank and video attributes and analyze search ranking day by day. It's useful for content creation.
+Find the relationship between search rank and video attributes. Analyze search ranking day by day. It's useful for content creation.
 I will analyze children's content because it is one of the most popular and viewed segments on YouTube.
 ### Goals
 - Extract data from YouTube
-- Clean and optimize Data set for analysis
 - Load Data set to warehouse
+- Clean and optimize Data set for analysis
 - Load Data set to DB (staging --> business)
 - Analysis Data set
 ### Stack used
@@ -38,7 +38,7 @@ I will analyze children's content because it is one of the most popular and view
 - Create S3 bucket in Object Storage.
 - Create connections
 - Check the data to be used
-- Create schemas and tables (I've defined [DAG](dag_create_tables_youtube.py) to create 2 schema with 3 tables (one is staging and two are business))
+- Create schemas and tables. I've defined [DAG](dag_create_tables_youtube.py) to create 2 schema with 3 tables (one is staging and two are business))
 ### Extract from YouTube
 I've decided to use the [Google API](https://developers.google.com/youtube/v3/docs/search/list) in PythonOperator to extract information from search results with request: "мультики для малышей". There are two methods which I've used search.list() and videos.list(). With these methods, I was able to extract the following information:
 ```csv
@@ -47,7 +47,7 @@ date_extract, video_id, title, description, view_count, like_count,comment_count
 The task 'extract_youtube' in the [DAG](dag_youtube_s3_pd.py)
 ![image](images/dag.png)
 ### Transform and Load
-Then I defined 2 parallel tasks:
+Then I've defined 2 parallel tasks:
 - One load data without transformation to wharehouse, using PythonOperator in task:
 ```python
 def load_df_s3(**context):
@@ -78,6 +78,8 @@ t4 = PostgresOperator(task_id='load_business',
                     ''')
 ```
 ![image](images/postgres%20-%20business.png)
+
+Then I've cleaned staging table.
 ### Analysis
 ![image](images/top%2015%20in%20search.bmp)
 ### Conclusion
