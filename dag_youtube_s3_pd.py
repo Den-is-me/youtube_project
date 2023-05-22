@@ -12,7 +12,7 @@ from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 dag = DAG(
     dag_id='dag_tr_youtube_s3_pd.py',
     default_args={'owner': 'aiflow'},
-    schedule_interval='0 5 * * *',
+    schedule_interval='0 9 * * *',
     start_date=days_ago(1)
 )
 
@@ -130,12 +130,30 @@ t2 = PythonOperator(task_id='load_df_s3',
                     python_callable=load_df_s3,
                     dag=dag)
 
-t3 = PythonOperator(task_id='tr_s3_postgres_staging',
+t3 = PostgresOperator(task_id='create_staging_youtube',
+                      postgres_conn_id='postgres',
+                      dag=dag,
+                      sql='''
+                        CREATE TABLE public.youtube (
+                        rank serial4 NOT NULL,
+                        date_extract timestamp NOT NULL,
+                        video_id text NOT NULL,
+                        title text NULL,
+                        description text NULL,
+                        view_count bigint NULL,
+                        like_count int4 NULL,
+                        comment_count int4 NULL,
+                        time_published timestamp NULL,
+                        channel_id text NOT NULL,
+                        channel_title text NULL)
+                    ''')
+t4 = PythonOperator(task_id='tr_s3_postgres_staging',
                     python_callable=load_df_postgres,
                     dag=dag)
 
-t4 = PostgresOperator(task_id='load_business',
+t5 = PostgresOperator(task_id='load_business',
                       postgres_conn_id='postgres',
+                      dag=dag,
                       sql='''
                     INSERT INTO business.channels
                     SELECT DISTINCT(channel_id), channel_title
@@ -149,8 +167,9 @@ t4 = PostgresOperator(task_id='load_business',
                     FROM public.youtube;
                     ''')
 
-t5 = PostgresOperator(task_id='clear_staging_youtube',
+t6 = PostgresOperator(task_id='clear_staging_youtube',
                       postgres_conn_id='postgres',
-                      sql='TRUNCATE public.youtube')
+                      dag=dag,
+                      sql='DROP TABLE public.youtube')
 
-t1 >> [t2, t3], t3 >> t4 >> t5
+t1 >> [t2, t3], t3 >> t4 >> t5 >> t6
