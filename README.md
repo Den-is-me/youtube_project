@@ -81,5 +81,5 @@ t4 = PostgresOperator(task_id='load_business',
 
 Then I've cleaned staging table.
 ### Analysis
-![image](images/top%2015%20in%20search.bmp)
+![image](images/dashboard.png)
 ### Conclusion
