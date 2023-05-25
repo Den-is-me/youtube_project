@@ -85,3 +85,8 @@ Then I've cleaned staging table.
 The popularity of channels from the top 100 search, sort by rank:
 ![image](images/channels.png)
 ### Conclusion
+The position in the search results depends on several parameters, the most important of which are the views and publication of the data.
+Parameter importance alternates in search. The first video has high view rates and was posted relatively recently. Then the second video has low views count and was posted long time ago. On the other hand, the third video received more views than the second, but was published earlier.
+
+The position in the search does not depend on the views of the channel. The video of the most viewed channel is at 336th place.
+The channel which has the most videos in top 100 of the search is at 11th place and has 46 videos in the search, while the first video's channel has 11 videos in the search
