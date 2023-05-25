@@ -82,4 +82,6 @@ t4 = PostgresOperator(task_id='load_business',
 Then I've cleaned staging table.
 ### Analysis
 ![image](images/dashboard.png)
+The popularity of channels from the top 100 search, sort by rank:
+![image](images/channels.png)
 ### Conclusion
