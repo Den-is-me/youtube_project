@@ -14,8 +14,8 @@
 - [Conclusion](#conclusion)
 ## Plan
 ### Idea
-Find the relationship between search rank and video attributes. Analyze search ranking day by day. It's useful for content creation.
-I will analyze kid's content because it is one of the most popular and viewed segments on YouTube.
+Find the relationship between search rank and video attributes. Analyze search ranking day by day. It's useful for content creation. In this project 
+I analyzed kid's content because it is one of the most popular and viewed segments on YouTube.
 ### Goals
 - Extract data from YouTube
 - Load Data set to warehouse
